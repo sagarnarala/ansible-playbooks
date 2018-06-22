@@ -1,0 +1,17 @@
+---
+ - name: Creating filesystems in centos
+   hosts: all
+   become: yes
+   tasks:
+    - name: creating ext4 filesystem
+      filesystem:
+           fstype: ext4
+           dev: /dev/sdb
+
+
+    - name: mount filesystem
+      mount:
+        fstype: ext4
+        path: /data
+        src: /dev/sdb
+        state: mounted

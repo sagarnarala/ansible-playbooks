@@ -1,0 +1,12 @@
+# This is my first condition yml
+---
+  - name: Test condition
+    hosts: all
+    tasks:
+       - name: Running false command
+         shell: false
+         register: OUT
+         ignore_errors: yes
+       
+       - shell: echo Hello
+         when: OUT|failed

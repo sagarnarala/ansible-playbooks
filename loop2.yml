@@ -1,0 +1,17 @@
+# Install packages using variables
+---
+ - name: Install httpd,git and gcc
+   hosts: all
+   become: yes
+   vars:
+     pack:
+      - httpd
+      - httpd-devel
+      - gcc
+      - git
+   tasks:
+      - name: install packages
+        package:
+           name: "{{item}}"
+           state: installed
+        with_items: "{{pack}}"

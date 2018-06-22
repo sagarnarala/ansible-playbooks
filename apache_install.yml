@@ -1,0 +1,58 @@
+---
+#Installation of apache web server
+- name: Install web_portal
+  hosts: web-servers
+  become: yes
+  tasks:
+
+     - name: Install httpd,nginx and nmap
+       yum:
+        update_cache: yes
+        name: "{{item}}"
+       with_items:
+           - httpd
+           - nginx
+           - nmap
+
+     - name: Copy data files
+       copy:
+         src: index.html
+         dest: /var/www/html/
+       register: copy_status
+
+     - name: stop httpd service
+       service:
+          name: httpd
+          state: stopped
+
+     - name: Copy template files
+       template:
+           src: current.html.j2
+           dest: /var/www/html/current.html
+       notify:
+          - Start httpd
+
+     - name: Check uptime
+       shell: uptime
+       register: uptime_var
+
+     - name: Copy status
+       debug:
+         var: copy_status
+
+     - name: Testing conditionals
+       shell: uptime
+       when: ansible_hostname == "node1"
+
+     - name: Testing until
+       shell: service httpd status
+       register: result
+       until: result.stdout.find("running") != -1
+       retries: 5
+       delay: 5
+
+  handlers:
+     - name: Start httpd
+       service:
+          name: httpd
+          state: restarted
